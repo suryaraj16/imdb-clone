@@ -1,39 +1,72 @@
-import { useState } from "react";
-import MovieCard from "./components/MovieCard";
-import { searchMovies } from "./services/api";
+import { useState, useEffect } from "react";
+import TodoInput from "./components/TodoInput";
+import TodoItem from "./components/TodoItem";
+import FilterBar from "./components/FilterBar";
 import "./App.css";
 
 function App() {
 
-  const [movies, setMovies] = useState([]);
-  const [query, setQuery] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState("all");
 
-  const handleSearch = async () => {
-    const data = await searchMovies(query);
-    setMovies(data);
+  // Load tasks from localStorage
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (savedTasks) {
+      setTasks(savedTasks);
+    }
+  }, []);
+
+  // Save tasks to localStorage
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = (text) => {
+    const newTask = {
+      id: Date.now(),
+      text: text,
+      completed: false
+    };
+
+    setTasks([...tasks, newTask]);
   };
 
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "completed") return task.completed;
+    if (filter === "pending") return !task.completed;
+    return true;
+  });
+
   return (
-    <div className="container">
+    <div className="app-container">
 
-      <h1>IMDb Clone</h1>
+      <h1>To-Do App</h1>
 
-      <div className="search-box">
-        <input
-          type="text"
-          placeholder="Search movies..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <TodoInput addTask={addTask} />
 
-        <button onClick={handleSearch}>
-          Search
-        </button>
-      </div>
+      <FilterBar setFilter={setFilter} />
 
-      <div className="movie-grid">
-        {movies && movies.map((movie) => (
-          <MovieCard key={movie.imdbID} movie={movie} />
+      <div className="todo-list">
+        {filteredTasks.map((task) => (
+          <TodoItem
+            key={task.id}
+            task={task}
+            toggleTask={toggleTask}
+            deleteTask={deleteTask}
+          />
         ))}
       </div>
 

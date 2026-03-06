@@ -1,67 +1,66 @@
 import { useState, useEffect } from "react";
-import NoteItem from "./components/NoteItem";
+import MovieCard from "./components/MovieCard";
+import { searchMovies } from "./services/api";
 import "./App.css";
 
 function App() {
 
-  const [notes, setNotes] = useState([]);
-  const [input, setInput] = useState("");
+  const [query, setQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  // Load notes from localStorage
+  // Debouncing
   useEffect(() => {
-    const savedNotes = JSON.parse(localStorage.getItem("notes"));
-    if (savedNotes) {
-      setNotes(savedNotes);
-    }
-  }, []);
 
-  // Save notes to localStorage
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500);
+
+    return () => clearTimeout(timer);
+
+  }, [query]);
+
+  // API call
   useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
 
-  const addNote = () => {
-    if (input.trim() === "") return;
+    const fetchData = async () => {
 
-    const newNote = {
-      id: Date.now(),
-      text: input
+      if (debouncedQuery === "") {
+        setMovies([]);
+        return;
+      }
+
+      const results = await searchMovies(debouncedQuery);
+      setMovies(results);
     };
 
-    setNotes([...notes, newNote]);
-    setInput("");
-  };
+    fetchData();
 
-  const deleteNote = (id) => {
-    setNotes(notes.filter(note => note.id !== id));
-  };
+  }, [debouncedQuery]);
 
   return (
-    <div className="app-container">
+    <div className="container">
 
-      <h1>Notes App</h1>
+      <h1>Movie Search</h1>
 
-      <div className="input-box">
-        <input
-          type="text"
-          placeholder="Write a note..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
+      <input
+        type="text"
+        placeholder="Search movies..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="search-bar"
+      />
 
-        <button onClick={addNote}>
-          Add Note
-        </button>
-      </div>
+      {movies.length === 0 && debouncedQuery !== "" && (
+        <p>No Results Found</p>
+      )}
 
-      <div className="notes-list">
-        {notes.map(note => (
-          <NoteItem
-            key={note.id}
-            note={note}
-            deleteNote={deleteNote}
-          />
+      <div className="movie-grid">
+
+        {movies.map((movie) => (
+          <MovieCard key={movie.imdbID} movie={movie} />
         ))}
+
       </div>
 
     </div>

@@ -1,26 +1,40 @@
-.app{
+.app-container{
 text-align:center;
-padding:50px;
-transition:all 0.4s ease;
+padding:30px;
 }
 
-.light{
-background:white;
-color:black;
+.input-box{
+margin:20px;
 }
 
-.dark{
-background:#121212;
+.input-box input{
+padding:10px;
+width:250px;
+}
+
+.input-box button{
+padding:10px;
+margin-left:10px;
+}
+
+.notes-list{
+max-width:400px;
+margin:auto;
+}
+
+.note-item{
+display:flex;
+justify-content:space-between;
+background:#f4f4f4;
+margin:10px;
+padding:10px;
+border-radius:6px;
+}
+
+.note-item button{
+background:red;
 color:white;
-}
-
-button{
-padding:10px 20px;
-margin-top:20px;
+border:none;
+padding:5px 10px;
 cursor:pointer;
-}
-
-.completed{
-text-decoration:line-through;
-color:gray;
 }

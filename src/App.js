@@ -7,7 +7,3 @@ import MovieDetails from "./pages/MovieDetails";
 </Routes>
 
 
-}
-
-export default App;
-

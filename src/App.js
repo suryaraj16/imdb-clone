@@ -10,6 +10,10 @@ import {
 
 function App() {
   const [user, setUser] = useState(null);
+  const [filteredMovies, setFilteredMovies] = useState([]);
+const [genre, setGenre] = useState("");
+const [sort, setSort] = useState("");
+const [year, setYear] = useState("");
 
   if (!user) {
     return <Auth setUser={setUser} />;
